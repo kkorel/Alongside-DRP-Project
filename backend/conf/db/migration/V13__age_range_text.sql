@@ -1,0 +1,2 @@
+ALTER TABLE participants
+  ALTER COLUMN age TYPE TEXT USING age::TEXT;

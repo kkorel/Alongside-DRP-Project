@@ -1,0 +1,457 @@
+/* onboarding.css — hand-drawn "alongside" survey primitives.
+   Ported from the design handoff (Onboarding survey.html <style>), scoped to
+   .onboarding-root so the sketchy theme never leaks into the rest of the app. */
+
+.onboarding-root {
+  --hand: var(--font-hand), 'Comic Sans MS', cursive;
+  --scrawl: var(--font-scrawl), cursive;
+  --paper: #f6f1e9;
+  --card: #fbf8f2;
+  --ink: #3a342d;
+  --muted: #8d8478;
+  --faint: #b7afa1;
+  --line: #cbbfae;
+  --warm: oklch(0.68 0.085 48);
+  --warm-soft: color-mix(in oklch, var(--warm) 20%, var(--paper));
+  --calm: oklch(0.66 0.05 165);
+  --calm-soft: color-mix(in oklch, var(--calm) 18%, var(--paper));
+
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--hand);
+  -webkit-font-smoothing: antialiased;
+}
+
+.onboarding-root * {
+  box-sizing: border-box;
+}
+
+/* ---- sketchy hand-drawn primitives ---- */
+.onboarding-root .sk {
+  border: 2px solid var(--ink);
+  border-radius: 255px 14px 225px 16px/16px 225px 18px 255px;
+  background: var(--card);
+}
+.onboarding-root .sk.v2 {
+  border-radius: 14px 240px 16px 255px/230px 16px 255px 16px;
+}
+.onboarding-root .sk.v3 {
+  border-radius: 225px 16px 240px 14px/14px 230px 16px 240px;
+}
+.onboarding-root .sk.thin {
+  border-width: 1.6px;
+}
+.onboarding-root .sk.soft {
+  border-color: var(--line);
+}
+.onboarding-root .dash {
+  border-style: dashed;
+}
+.onboarding-root .scrawl {
+  font-family: var(--scrawl);
+}
+.onboarding-root .h-title {
+  font-family: var(--scrawl);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.onboarding-root .uline {
+  position: relative;
+  display: inline-block;
+}
+.onboarding-root .uline::after {
+  content: "";
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  bottom: -6px;
+  height: 7px;
+  background: no-repeat center/100% 100%
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='8'%3E%3Cpath d='M1 5 C30 1 60 8 90 3 110 0 118 5 119 5' stroke='%23c98a5a' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+.onboarding-root .btn {
+  font-family: var(--hand);
+  font-size: 16px;
+  border: 2px solid var(--ink);
+  background: var(--card);
+  color: var(--ink);
+  padding: 9px 20px;
+  border-radius: 40px 14px 40px 14px/14px 40px 14px 40px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition:
+    transform 0.12s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.onboarding-root .btn:hover {
+  transform: translateY(-1px);
+}
+.onboarding-root .btn:active {
+  transform: translateY(0) scale(0.96);
+}
+.onboarding-root .btn.warm {
+  background: var(--warm);
+  border-color: transparent;
+  color: #fff;
+}
+/* Next — leans warmer/deeper orange on hover */
+.onboarding-root .btn.warm:hover {
+  background: oklch(0.62 0.105 48);
+  box-shadow: 0 4px 14px color-mix(in oklch, var(--warm) 45%, transparent);
+}
+.onboarding-root .btn.ghost {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--muted);
+}
+/* Back — settles into a soft grey on hover */
+.onboarding-root .btn.ghost:hover {
+  background: color-mix(in oklch, var(--line) 28%, var(--paper));
+  border-color: var(--faint);
+  color: var(--ink);
+}
+.onboarding-root .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+/* calm (green) primary — used by the quiet-space card */
+.onboarding-root .btn.calm {
+  background: var(--calm);
+  border-color: transparent;
+  color: #fff;
+}
+.onboarding-root .btn.calm:hover {
+  background: oklch(0.6 0.06 165);
+}
+
+/* The global stylesheet gives every <button> a hover lift + click press so the
+   rest of the app matches these .btn controls. The survey's own option chips,
+   shards and save-pill are deliberately still (colour-only hover), so opt them
+   back out here — only the .btn buttons above should move. */
+.onboarding-root button:not(.btn):hover,
+.onboarding-root button:not(.btn):active {
+  transform: none;
+}
+
+/* ---- chips (meta tags on the invitation card) ---- */
+.onboarding-root .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.6px solid var(--line);
+  background: var(--card);
+  border-radius: 40px;
+  padding: 4px 11px;
+  font-size: 14px;
+}
+.onboarding-root .chip.calm {
+  border-color: var(--calm);
+  background: var(--calm-soft);
+  color: #3c5a4c;
+}
+
+.onboarding-root .leader {
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- survey: 'why we ask' line (always visible — trauma-informed transparency) ---- */
+.onboarding-root .why {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14.5px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ---- prominent OPTIONAL badge (next to a question) ---- */
+.onboarding-root .opt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--hand);
+  font-size: 15px;
+  line-height: 1;
+  color: #3c5a4c;
+  background: var(--calm-soft);
+  border: 1.6px solid var(--calm);
+  padding: 4px 11px 5px;
+  border-radius: 30px;
+}
+.onboarding-root .opt-badge .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.6px solid var(--calm);
+}
+/* a gentle 'needed' marker for the required basics — not a red star */
+.onboarding-root .need-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--hand);
+  font-size: 15px;
+  line-height: 1;
+  color: #7a4a2e;
+  background: var(--warm-soft);
+  border: 1.6px solid var(--warm);
+  padding: 4px 11px 5px;
+  border-radius: 30px;
+}
+
+/* ---- 'why we ask + how we use it' block (green vertical bar + text) ---- */
+.onboarding-root .whyask {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  font-size: 16.5px;
+  color: var(--muted);
+  line-height: 1.4;
+  max-width: 680px;
+}
+.onboarding-root .whyask .wbar {
+  width: 3px;
+  border-radius: 3px;
+  background: var(--calm);
+  flex: 0 0 auto;
+}
+.onboarding-root .whyask b {
+  color: var(--ink);
+  font-weight: 400;
+  font-family: var(--scrawl);
+  font-size: 18px;
+}
+
+/* ---- prominent 'save & come back later' pill ---- */
+.onboarding-root .save-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--hand);
+  font-size: 15.5px;
+  color: #3c5a4c;
+  background: var(--calm-soft);
+  border: 2px solid var(--calm);
+  padding: 9px 17px;
+  cursor: pointer;
+  border-radius: 40px 14px 40px 14px/14px 40px 14px 40px;
+  transition: background-color 0.16s ease;
+}
+.onboarding-root .save-pill:hover {
+  background: oklch(0.6 0.06 165);
+  color: #fff;
+}
+
+/* a 'good place to pause' panel — progressive disclosure / finish-for-now */
+.onboarding-root .pause-card {
+  border: 2.5px solid var(--calm);
+  background: var(--card);
+  border-radius: 14px 240px 16px 255px/230px 16px 255px 16px;
+  padding: 26px 30px;
+}
+
+/* ---- survey: option boxes ---- */
+.onboarding-root .opt {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 17px;
+  font-size: 17.5px;
+  cursor: pointer;
+  color: var(--ink);
+  background: var(--card);
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+  width: 100%;
+  text-align: left;
+  font-family: var(--hand);
+}
+/* coloring on hover (no movement) — mirrors the back/next buttons */
+.onboarding-root .opt:hover {
+  border-color: var(--warm);
+  background: var(--warm-soft);
+}
+.onboarding-root .opt.sel:hover {
+  background: color-mix(in oklch, var(--warm) 32%, var(--paper));
+}
+.onboarding-root .opt.skip:hover {
+  border-color: var(--calm);
+  background: var(--calm-soft);
+}
+.onboarding-root .opt.skip.sel:hover {
+  background: color-mix(in oklch, var(--calm) 30%, var(--paper));
+}
+.onboarding-root .opt .ind {
+  width: 23px;
+  height: 23px;
+  flex: 0 0 auto;
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.onboarding-root .opt.single .ind {
+  border-radius: 50%;
+}
+.onboarding-root .opt.multi .ind {
+  border-radius: 7px;
+}
+.onboarding-root .opt.sel {
+  border-color: var(--warm);
+  background: var(--warm-soft);
+  color: #7a4a2e;
+}
+.onboarding-root .opt.sel .ind {
+  border-color: var(--warm);
+  background: var(--warm);
+}
+/* the skip / 'rather not say' option — deliberately set apart so it feels easy */
+.onboarding-root .opt.skip {
+  border-style: dashed;
+  border-color: var(--calm);
+  color: #3c5a4c;
+  background: transparent;
+  font-style: italic;
+}
+.onboarding-root .opt.skip .ind {
+  border-radius: 50%;
+  border-color: var(--calm);
+  border-style: dashed;
+}
+.onboarding-root .opt.skip.sel {
+  background: var(--calm-soft);
+}
+.onboarding-root .opt.skip.sel .ind {
+  background: var(--calm);
+  border-style: solid;
+}
+
+/* text input */
+.onboarding-root .field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 17px;
+  font-size: 17.5px;
+  color: var(--ink);
+  background: var(--card);
+}
+.onboarding-root .field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--hand);
+  font-size: 17.5px;
+  color: var(--ink);
+  caret-color: var(--warm);
+}
+.onboarding-root .field input::placeholder {
+  color: var(--muted);
+}
+
+/* ---- option style: inline chips (colour-only selection, no marker) ---- */
+.onboarding-root .chip-opt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 18px;
+  font-size: 17px;
+  cursor: pointer;
+  color: var(--ink);
+  background: var(--card);
+  font-family: var(--hand);
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+}
+.onboarding-root .chip-opt.sel {
+  background: var(--warm);
+  border-color: transparent;
+  color: #fff;
+}
+.onboarding-root .chip-opt.skip {
+  border-style: dashed;
+  border-color: var(--calm);
+  color: #3c5a4c;
+  font-style: italic;
+  background: transparent;
+}
+.onboarding-root .chip-opt.skip.sel {
+  background: var(--calm);
+  border-style: solid;
+  color: #fff;
+}
+/* coloring on hover (no movement) — mirrors the back/next buttons */
+.onboarding-root .chip-opt:hover {
+  border-color: var(--warm);
+  background: var(--warm-soft);
+}
+.onboarding-root .chip-opt.sel:hover {
+  background: oklch(0.62 0.105 48);
+}
+.onboarding-root .chip-opt.skip:hover {
+  border-color: var(--calm);
+  background: var(--calm-soft);
+}
+.onboarding-root .chip-opt.skip.sel:hover {
+  background: oklch(0.6 0.06 165);
+}
+
+/* ---- text input style: underline only ---- */
+.onboarding-root .uinput {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  color: var(--ink);
+  padding: 6px 2px 11px;
+  border-bottom: 2.5px dashed var(--line);
+}
+.onboarding-root .uinput input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--hand);
+  font-size: 18px;
+  color: var(--ink);
+  caret-color: var(--warm);
+}
+.onboarding-root .uinput input::placeholder {
+  color: var(--muted);
+}
+
+/* ---- clickable shards: lift + linkable label ---- */
+.onboarding-root .shard {
+  cursor: pointer;
+}
+.onboarding-root .shard .node {
+  transition: transform 0.12s ease;
+}
+.onboarding-root .shard .slabel {
+  border-bottom: 1.6px dotted var(--faint);
+  padding-bottom: 1px;
+  transition: border-color 0.15s ease, border-style 0.15s ease;
+}
+.onboarding-root .shard:hover .slabel {
+  border-bottom-color: var(--warm);
+  border-bottom-style: solid;
+}

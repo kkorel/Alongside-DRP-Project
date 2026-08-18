@@ -1,0 +1,9 @@
+.DS_Store
+.bsp/
+.metals/
+metals.sbt
+.scala-build/
+.bloop/
+.vscode/
+.idea/
+.idea_modules/

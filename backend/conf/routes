@@ -1,0 +1,50 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+GET     /support-requests          controllers.SupportRequestController.index
+POST    /support-requests          controllers.SupportRequestController.create
+
+GET     /people                                    controllers.PeerSupportController.people
+GET     /groups/:groupId                           controllers.PeerSupportController.group(groupId: Int)
+GET     /groups/:groupId/participants              controllers.PeerSupportController.participants(groupId: Int)
+GET     /participants/:participantId               controllers.PeerSupportController.participantInfo(participantId: Int)
+GET     /participants/:participantId/onboarding    controllers.OnboardingController.onboarding(participantId: Int)
+PATCH   /participants/:participantId/onboarding    controllers.OnboardingController.saveOnboarding(participantId: Int)
+GET     /groups/:groupId/messages                  controllers.PeerSupportController.messages(groupId: Int)
+POST    /groups/:groupId/messages                  controllers.PeerSupportController.sendGroupMessage(groupId: Int)
+POST    /groups/:groupId/facilitator-messages      controllers.FacilitatorSupportController.sendFacilitatorMessage(groupId: Int)
+GET     /groups/:groupId/:participantId/facilitator-messages      controllers.FacilitatorSupportController.facilitatorMessages(groupId: Int, participantId: Int)
+POST    /groups/:groupId/reflections               controllers.QuietRoomController.createReflection(groupId: Int)
+GET     /groups/:groupId/participants/:participantId/reflection   controllers.QuietRoomController.latestReflection(groupId: Int, participantId: Int)
+GET     /groups/:groupId/support-links             controllers.QuietRoomController.supportLinks(groupId: Int)
+GET     /groups/:groupId/meditation-playlists      controllers.QuietRoomController.meditationPlaylists(groupId: Int)
+POST    /groups/:groupId/doodles                   controllers.QuietRoomController.saveDoodle(groupId: Int)
+GET     /groups/:groupId/participants/:participantId/doodles   controllers.QuietRoomController.doodles(groupId: Int, participantId: Int)
+
+# User dashboard questions
+POST    /participants/:participantId/icebreakers   controllers.DashboardController.saveIcebreaker(participantId: Int)
+GET     /participants/:participantId/icebreakers   controllers.DashboardController.getIcebreakers(participantId: Int)
+
+# Current session validity
+GET     /groups/:groupId/is-valid                  controllers.PeerSupportController.isValidSessionNow(groupId: Int)
+POST    /groups/:groupId/start-session             controllers.PeerSupportController.startSession(groupId: Int)
+POST    /groups/:groupId/end-session               controllers.PeerSupportController.endSession(groupId: Int)
+
+# Facilitator views
+GET     /facilitator/groups                        controllers.FacilitatorController.groups(facilitatorId: Option[Int])
+POST    /facilitator/groups                        controllers.FacilitatorController.createGroup(facilitatorId: Option[Int])
+PATCH   /facilitator/groups/:groupId               controllers.FacilitatorController.updateGroup(groupId: Int)
+DELETE  /facilitator/groups/:groupId               controllers.FacilitatorController.deleteGroup(groupId: Int)
+GET     /facilitator/groups/:groupId/inbox         controllers.FacilitatorController.inbox(groupId: Int)
+GET     /facilitator/groups/:groupId/notes         controllers.FacilitatorController.groupNotes(groupId: Int)
+PATCH   /facilitator/groups/:groupId/notes         controllers.FacilitatorController.updateGroupNotes(groupId: Int)
+POST    /facilitator/groups/:groupId/participants  controllers.FacilitatorController.placeParticipant(groupId: Int)
+GET     /facilitator/arrivals                      controllers.FacilitatorController.arrivals
+GET     /facilitator/participants/:participantId   controllers.FacilitatorController.participant(participantId: Int)
+GET     /facilitator/groups/:groupId/note-prompts  controllers.FacilitatorController.getNotePrompts(groupId: Int)
+PATCH   /facilitator/groups/:groupId/note-prompts  controllers.FacilitatorController.setNotePrompts(groupId: Int)
