@@ -1,0 +1,1 @@
+ALTER TABLE support_groups ADD COLUMN has_session_now BOOLEAN NOT NULL DEFAULT FALSE;
