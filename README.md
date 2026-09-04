@@ -1,86 +1,126 @@
-# alongside
+# Alongside
 
-This is our prototype of a facilitated peer-support platform for bereaved young adults, built for the Designing for Real People course at Imperial College London. We worked on it as a group.
-
-DRP (Designing for Real People) is a course that pairs student teams with a real problem area and asks them to build and iterate on a working prototype rather than just a design document. Our brief was peer grief support: many bereaved young adults want reliable, convenient support from people with similar experience, but don't know where to find it, feel awkward repeatedly bringing grief up with friends, or find it hard to enter formal services. `PRODUCT_SPEC.md` in this repo has the fuller problem statement and user flow we designed against.
+[![CI](https://github.com/kkorel/Alongside-DRP-Project/actions/workflows/ci.yml/badge.svg)](https://github.com/kkorel/Alongside-DRP-Project/actions/workflows/ci.yml)
 
 ## What it does
 
-There's no authentication. From the front page you pick who you want to be from a list of seeded participants and facilitators, and the app carries that identity through the URL for the rest of the session.
+Alongside is a prototype web app for facilitated peer-support groups for bereaved young adults, built as a Designing for Real People course project.
 
-As a participant, the flow is:
+Many bereaved young adults want support from people with a similar experience but do not know where to find it, feel awkward raising grief with friends again, or find formal services hard to enter. Alongside gives a small group a scheduled chat room run by a facilitator, a private line to that facilitator, and a quiet space to write, breathe, doodle, or find support links, and gives the facilitator a dashboard to create groups, place new arrivals, keep notes, and open or end each session. It is a prototype with no authentication and demo people seeded by the database migrations, and a deployed copy runs at [drp-07.vercel.app](https://drp-07.vercel.app) against the API at `drp07-production.up.railway.app`.
 
-- Go through an onboarding survey (or skip straight to your dashboard if you've already done it).
-- Land on a calm dashboard showing a short daily check-in, your upcoming group session, and whether the facilitator has opened the room yet.
-- Once a session is open, step into the group chat room: send and read messages, hover over the participant count to see who else is in the room, and click a participant to see their "About me" and "Fun fact".
-- Privately message the facilitator without posting to the group.
-- Step away into a quiet reflection space at any point: guided or free writing, a breathing exercise, a short doodle pad, a meditation playlist, and a resources page. You can always return to the main chat from there, and you can save or share a written reflection with the facilitator.
-- Leave the room calmly when you're done, or get a gentle notice if the facilitator ends the session while you're in it.
+## Quickstart
 
-As a facilitator, there's a separate dashboard: create and edit support groups, see who has arrived, place participants into groups, read the private messages sent to you, view/leave notes on a group, and open or close a session.
+Use JDK 21 and Node.js 22, the versions CI runs, plus sbt and a PostgreSQL server that accepts SSL connections. The backend appends `sslmode=require` to the JDBC URL, so a server without SSL is refused with "The server does not support SSL".
 
-The project outgrew the original "walking skeleton" scope in `PRODUCT_SPEC.md` along the way. That spec explicitly lists a full facilitator dashboard as a non-goal for the first prototype, but the facilitator side described above ended up getting built too.
-
-## Tech stack
-
-- **Frontend**: Next.js (App Router), React, TypeScript, Tailwind CSS.
-- **Backend**: Scala, Play Framework, Guice for dependency injection.
-- **Database access**: Slick, against PostgreSQL.
-- **Migrations**: Flyway, run automatically on backend startup.
-- **Deployment**: frontend on Vercel, backend on Railway, built from the `Dockerfile` in `backend/`.
-
-## Repository layout
-
-```
-.
-├── backend/                     # Scala Play backend
-│   ├── app/controllers/         # HTTP controllers (peer support, facilitator, onboarding, quiet room, ...)
-│   ├── app/models/              # API/domain models and JSON formats
-│   ├── app/repositories/        # Slick database access, grouped by feature
-│   ├── app/config/              # Database config and Flyway migration wiring
-│   ├── conf/routes              # Backend routes
-│   ├── conf/db/migration/       # Flyway SQL migrations (schema + seed data)
-│   └── Dockerfile               # Backend container build
-├── frontend/                    # Next.js frontend
-│   ├── app/onboarding/          # Onboarding survey
-│   ├── app/dashboard/           # Participant home base
-│   ├── app/room/                # Group chat room
-│   ├── app/(quiet)/             # Quiet reflection space (write, breathe, calm, draw, resources)
-│   └── app/facilitator/         # Facilitator dashboard
-├── PRODUCT_SPEC.md              # Problem statement and MVP user stories we designed against
-└── LICENSE
-```
-
-## Running it locally
-
-You need Node.js, npm, JDK 21, sbt, and a PostgreSQL database.
-
-**Backend**
+Start the backend. It listens on port 9000. The first request compiles the app and applies the Flyway migrations, which create the schema and seed the demo data.
 
 ```bash
-cd backend
-export DATABASE_URL="postgres://username:password@host:5432/database_name"
-export PLAY_HTTP_SECRET_KEY="some-secret"
+git clone https://github.com/kkorel/Alongside-DRP-Project.git
+cd Alongside-DRP-Project/backend
+export DATABASE_URL="postgres://USER:PASSWORD@HOST:5432/DATABASE"
 sbt run
 ```
 
-This starts Play on `http://localhost:9000` and runs the Flyway migrations (schema + seed data, including a seeded support group and participants) on startup. `DatabaseConfig` builds the JDBC URL from `DATABASE_URL` with `sslmode=require`, so a local Postgres instance without SSL may need adjusting.
-
-**Frontend**
+Start the frontend in a second terminal, then open http://localhost:3000.
 
 ```bash
-cd frontend
-npm install
-echo "NEXT_PUBLIC_API_URL=http://localhost:9000" > .env.local
+cd Alongside-DRP-Project/frontend
+npm ci
 npm run dev
 ```
 
-This starts the frontend on `http://localhost:3000`.
+The seed data gives you one facilitator, Sean (id 8), who holds "Monday Group" with participants 1 to 7 and an empty "Sunday Mornings", plus five participants (ids 9 to 13) waiting to be placed in a group.
 
-## Demo
+## Usage
 
-A live version is deployed at [drp-07.vercel.app](https://drp-07.vercel.app), backed by the Play API on Railway. As above, there's no login: pick someone from the list on the front page to see the app from their point of view.
+### Step into a seeded person
+
+There is no login. The front page lists everyone in the database and you pick who to be. The choice travels in the URL as `?pid=<id>` for a participant or `?fid=<id>` for a facilitator, and pages without an id fall back to participant 1 and facilitator 8.
+
+```text
+http://localhost:3000/dashboard?pid=1          Amber's dashboard
+http://localhost:3000/onboarding/intro?pid=1   Amber's onboarding survey
+http://localhost:3000/facilitator?fid=8        Sean's facilitator dashboard
+```
+
+As a participant you fill in the onboarding survey, keep a daily weather check-in on the dashboard, join the group chat while the facilitator has the room open, message the facilitator privately, and step into the quiet space (free or guided writing, breathing, a noticing exercise, meditation playlists, a doodle pad, and support links) with a way back to the room. As a facilitator you create and edit groups, place arrivals into them, read private messages and the reflections participants chose to share, keep private notes per group, and open or end the session. Participants can join only while the room is open and before the scheduled end time, and a session ended on its meeting day stays closed until the next one.
+
+### Call the API directly
+
+The backend is a JSON API with no authentication. Every route is listed in `backend/conf/routes`.
+
+```bash
+curl http://localhost:9000/people
+curl http://localhost:9000/groups/1
+curl "http://localhost:9000/facilitator/groups?facilitatorId=8"
+curl -X POST http://localhost:9000/groups/1/messages \
+  -H "Content-Type: application/json" \
+  -d '{"participantId":1,"body":"Hello everyone"}'
+```
+
+The message POST returns 201. A blank body returns 400 with `{"error":"Message failed"}`. The backend only answers requests whose Host header is `localhost:9000`, `127.0.0.1:9000`, or the Railway host, and only allows the browser origins `http://localhost:3000` and `https://drp-07.vercel.app`. Both lists are fixed in `backend/conf/application.conf`.
+
+## Configuration
+
+| Variable | Read by | Required | Default | Purpose |
+| --- | --- | --- | --- | --- |
+| `DATABASE_URL` | Backend, both `sbt run` and the Docker image | Yes | None. Startup fails without it | `postgres://user:password@host:port/database`, converted to a JDBC URL with `sslmode=require` |
+| `PLAY_HTTP_SECRET_KEY` | Docker image only | Yes | None. The app refuses to start in production mode without it | Play application secret. `sbt run` does not need it |
+| `PORT` | Docker image only | No | `9000` | HTTP port inside the container. Requests still need an allowed Host header, see above |
+| `NEXT_PUBLIC_API_URL` | Frontend | No | `http://localhost:9000` | Backend base URL, inlined by Next.js at build or dev start. Set it in `frontend/.env.local`, which is gitignored |
+
+## Development
+
+The backend is Play 3.0 on Scala 3.7 with Slick for database access and Flyway for migrations. The frontend is Next.js 16 with React 19, TypeScript, and Tailwind CSS 4.
+
+From `backend/`:
+
+```bash
+sbt compile
+sbt scalafmtCheckAll scalafmtSbtCheck   # formatting check, as CI runs it
+sbt scalafmtAll scalafmtSbt             # reformat
+sbt stage                               # production build: target/universal/stage/bin/play-scala-seed
+```
+
+From `frontend/`:
+
+```bash
+npm ci
+npm run lint
+npm run build
+npm run start   # serve the production build on port 3000
+```
+
+There are no automated tests. CI in `.github/workflows/ci.yml` runs the backend job (compile, formatting check, `Test/compile`) on every push and pull request, and the frontend job (`npm ci`, lint, build) on pull requests and pushes to `main`.
+
+To change the schema, add the next numbered file to `backend/conf/db/migration/`. The latest is `V30__create_dashboard_table.sql`. Flyway applies pending migrations when the backend starts. Slick table definitions live in `backend/app/repositories/tables/`.
+
+The backend Dockerfile builds the staged binary and runs it with `PORT` and `PLAY_HTTP_SECRET_KEY`:
+
+```bash
+docker build -t alongside-backend backend
+docker run -p 9000:9000 \
+  -e DATABASE_URL="postgres://USER:PASSWORD@HOST:5432/DATABASE" \
+  -e PLAY_HTTP_SECRET_KEY="a-long-random-string" \
+  alongside-backend
+```
+
+Repository layout:
+
+```text
+backend/app/controllers/      Play controllers, one per feature area
+backend/app/repositories/     Slick queries and table definitions
+backend/app/models/           Case classes and JSON formats
+backend/conf/routes           Every API route
+backend/conf/db/migration/    Flyway migrations V1 to V30, schema and seed data
+frontend/app/                 Next.js App Router pages and components
+frontend/app/lib/             API client, identity handling, navigation config
+frontend/app/facilitator/     Facilitator dashboard
+frontend/app/(quiet)/         Quiet space: write, calm, draw, resources
+PRODUCT_SPEC.md               Original walking-skeleton spec
+AGENTS.md                     Conventions for coding agents
+```
 
 ## License
 
-MIT, see `LICENSE`.
+[MIT](LICENSE).
